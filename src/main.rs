@@ -1,6 +1,5 @@
 use anyhow::{bail, Context, Result};
 use clap::{App, Arg};
-use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     ffi::OsStr,
@@ -9,57 +8,22 @@ use std::{
     time::SystemTime,
 };
 
-/// Main struct that is used for creating names
-#[derive(Serialize, Debug)]
-struct FileInfo<'a> {
-    filename: &'a OsStr,
-    extension: Option<&'a OsStr>,
-    path: &'a Path,
-    absolute_path: Option<PathBuf>,
-    accessed: Option<SystemTime>,
-    created: Option<SystemTime>,
-    modified: Option<SystemTime>,
-    filesize: Option<u64>,
-}
+mod file_info;
 
 
-impl FileInfo<'_> {
-    fn from_path<'a, T: AsRef<Path> + ?Sized>(path: &'a T) -> Result<FileInfo<'a>> {
-        let path = path.as_ref();
 
-        let filename = path.file_name().context("File has no filename")?;
-        let extension = path.extension();
-        let absolute_path = path.canonicalize().ok();
 
-        let md = path.metadata().ok();
-
-        fn call_and_flatten<U, V>(
-            meta: Option<&Metadata>,
-            f: impl Fn(&Metadata) -> Result<U, V>,
-        ) -> Option<U> {
-            meta.map(|m| f(m).ok()).flatten()
-        }
-
-        let accessed = call_and_flatten(md.as_ref(), Metadata::accessed);
-        let created = call_and_flatten(md.as_ref(), Metadata::created);
-        let modified = call_and_flatten(md.as_ref(), Metadata::modified);
-
-        let filesize = md.as_ref().map(Metadata::len);
-
-        Ok(FileInfo {
-            filename,
-            extension,
-            path,
-            absolute_path,
-            accessed,
-            created,
-            modified,
-            filesize,
-        })
-    }
-}
-
+// The pair of variable name (as its used in rename string) and its value as a string
 struct Fragments(HashMap<String, String>);
+
+// This is the struct which stores all the files as they're passed from the commandline
+// It can contain files which don't exist (represented by Err in file_info), and thus is to be used for reporting errors per file
+struct Files<'a> {
+    path_provided: &'a OsStr,
+    file_info: Result<file_info::FileInfo<'a>>,
+    fragments: Fragments
+
+}
 
 fn main() -> Result<()> {
     let matches = App::new("JRenamer")
@@ -75,13 +39,15 @@ fn main() -> Result<()> {
 
     let fragments = Fragments(HashMap::new());
 
-
     let finfos = match matches.values_of("input") {
-        Some(vals) => vals.filter_map(|v| FileInfo::from_path(v).ok()),
+        Some(vals) => vals.filter_map(|v| file_info::FileInfo::from_path(v).ok()),
         None => {
             bail!("You must supply at least one input item")
         }
     };
+
+
+
 
     //TODO: Make file info format neater, decide on OsStr
     for f in finfos.filter_map(|fi| serde_json::to_string(&fi).ok()) {
