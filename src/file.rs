@@ -143,14 +143,14 @@ impl File<'_> {
 
     pub fn parse_fstring(&self, fstring: &str) -> String {
         //TODO: Make this into a lazy static
-        let re: Regex = Regex::new(r"\$(.*?)\$").unwrap();
+        let re: Regex = Regex::new(r"\#(.*?)\#").unwrap();
 
         re.replace_all(fstring, |caps: &Captures| {
             println!("{:?}", caps);
 
             // Handle the escaped $$ case
             if &caps[1] == "" {
-                return "$".to_string()
+                return "#".to_string()
             };
 
             if let Some(v) = self.fragments.0.get(&caps[1]) {

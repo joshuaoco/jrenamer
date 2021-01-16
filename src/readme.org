@@ -33,3 +33,9 @@ Say our ~gps_getter.py~ can extract the GPS co-ordinates out of a file, it shoul
 #+begin_src json
 {"gps_longitude": "37.62", "gps_latitude: "55.75"}
 #+end_src
+
+*** Batch Mode
+Instead of user input, you can supply your format string at the command invocation with the ~-f/--format~ switch and it will be used.
+#+begin_src
+jrenamer file.txt other_file.txt -s gps_getter.py --format "#filesize#_#gps_longitude#"
+#+end_src
