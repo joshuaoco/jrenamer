@@ -1,13 +1,7 @@
 use anyhow::{anyhow, bail, Context, Error, Result};
 use clap::{App, Arg, ArgMatches};
 use file_info::FileInfo;
-use std::{
-    collections::HashMap,
-    ffi::OsStr,
-    io::{self, Write},
-    path::Path,
-    process::{Command, Stdio},
-};
+use std::{collections::HashMap, ffi::OsStr, fs, io::{self, Write}, path::Path, process::{Command, Stdio}};
 #[macro_use]
 extern crate lazy_static;
 mod file;
@@ -34,19 +28,21 @@ fn main() -> Result<()> {
 
     // Run the scripts against the files, building up fragments as we go
     for f in files.iter_mut() {
-        if f.exists() {
+        if f.exists() { // This check is actually redundant as the existence of file_info already tells this
             f.add_file_info_to_fragments();
 
             for s in scripts.iter() {
                 f.run_script(s)?;
             }
+
             let fstring = match matches.value_of("format") {
                 Some(val) => val.to_string(),
                 None => user_fstring(f)?
             };
 
             //TODO Parse user input and insert fragments where needed
-            println!("{}", f.parse_fstring(&fstring));
+            let new_name = f.parse_fstring(&fstring);
+            fs::rename(f.path_provided, new_name)?;
         }
     }
     Ok(())

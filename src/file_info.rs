@@ -30,6 +30,11 @@ impl FileInfo<'_> {
         let absolute_path = path.canonicalize().ok();
 
         let md = path.metadata().with_context(|| {
+            eprintln!(
+                "File \"{}\" probably doesn't exist",
+                filename.to_string_lossy()
+            );
+
             format!(
                 "File \"{}\" probably doesn't exist",
                 filename.to_string_lossy()
