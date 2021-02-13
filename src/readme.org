@@ -15,9 +15,9 @@ jrenamer file.txt other_file.txt
 This alone will visit these files and extract metadata such as ~filename~ and the ~created~ date.
 It will display the list of these fragments for each file, from which you can compose the new filename using the following syntax.
 
-: $filename$_$created$
+: #filename#_#created#
 
-Keys of fragments are surrounded by 2 ~$~ signs, to display an actual ~$~ sign, please use ~$$~.
+Keys of fragments are surrounded by 2 ~#~ signs, to display an actual ~#~ sign, please use ~##~.
 
 *** Script Extension
 Any number of scripts (python at the moment) can be set to run on the command line

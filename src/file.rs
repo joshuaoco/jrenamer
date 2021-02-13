@@ -165,7 +165,7 @@ impl File<'_> {
         re.replace_all(fstring, |caps: &Captures| {
             println!("{:?}", caps);
 
-            // Handle the escaped $$ case
+            // Handle the escaped ## case
             if &caps[1] == "" {
                 return "#".to_string();
             };
