@@ -75,7 +75,7 @@ fn user_fstring(f: &File) -> Result<String> {
     //TODO Get user input for filename
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
-    Ok(input)
+    Ok(input.trim().to_string())
 }
 
 fn get_scripts<'a>(ms: &'a ArgMatches) -> Vec<&'a Path> {
