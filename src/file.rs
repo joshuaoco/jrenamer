@@ -1,8 +1,14 @@
 use anyhow::{anyhow, bail, Context, Error, Result};
 use regex::{Captures, Regex};
 use serde_json::{value::Value, Map};
-use std::{collections::HashMap, ffi::OsStr, io::Write, path::Path, process::{Command, Stdio}, time::SystemTime};
-
+use std::{
+    collections::HashMap,
+    ffi::OsStr,
+    io::Write,
+    path::Path,
+    process::{Command, Stdio},
+    time::SystemTime,
+};
 
 use crate::file_info::FileInfo;
 use serde::ser::{self, Serialize, SerializeStruct};
@@ -99,17 +105,27 @@ impl File<'_> {
 
     pub fn add_file_info_to_fragments(&mut self) {
         if let Ok(fi) = &self.file_info {
-
-            self.fragments.0.insert("filename".to_string(), fi.filename.to_string_lossy().to_string());
+            self.fragments.0.insert(
+                "filename".to_string(),
+                fi.filename.to_string_lossy().to_string(),
+            );
 
             if let Some(extension_os) = fi.extension {
-                self.fragments.0.insert("extension".to_string(), extension_os.to_string_lossy().to_string());
+                self.fragments.0.insert(
+                    "extension".to_string(),
+                    extension_os.to_string_lossy().to_string(),
+                );
             }
 
-            self.fragments.0.insert("path".to_string(), fi.path.to_string_lossy().to_string());
+            self.fragments
+                .0
+                .insert("path".to_string(), fi.path.to_string_lossy().to_string());
 
             if let Some(abs_path) = &fi.absolute_path {
-                self.fragments.0.insert("absolute_path".to_string(), abs_path.to_string_lossy().to_string());
+                self.fragments.0.insert(
+                    "absolute_path".to_string(),
+                    abs_path.to_string_lossy().to_string(),
+                );
             }
 
             // We only care about second resolution time
@@ -118,26 +134,27 @@ impl File<'_> {
                     if let Ok(n) = t.duration_since(SystemTime::UNIX_EPOCH) {
                         //TODO: Need to deal with times being set before unix epoch?
 
-                        return Some((key.to_string(), n.as_secs().to_string()))
+                        return Some((key.to_string(), n.as_secs().to_string()));
                     }
                 }
                 None
             };
 
-            if let Some((k,v)) = s_if_there(&fi.accessed, "accessed") {
+            if let Some((k, v)) = s_if_there(&fi.accessed, "accessed") {
                 self.fragments.0.insert(k, v);
             }
 
-            if let Some((k,v)) = s_if_there(&fi.created, "created") {
+            if let Some((k, v)) = s_if_there(&fi.created, "created") {
                 self.fragments.0.insert(k, v);
             }
 
-            if let Some((k,v)) = s_if_there(&fi.modified, "modified") {
+            if let Some((k, v)) = s_if_there(&fi.modified, "modified") {
                 self.fragments.0.insert(k, v);
             }
 
-
-            self.fragments.0.insert("filesize".to_string(), fi.filesize.to_string());
+            self.fragments
+                .0
+                .insert("filesize".to_string(), fi.filesize.to_string());
         }
     }
 
@@ -150,19 +167,17 @@ impl File<'_> {
 
             // Handle the escaped $$ case
             if &caps[1] == "" {
-                return "#".to_string()
+                return "#".to_string();
             };
 
             if let Some(v) = self.fragments.0.get(&caps[1]) {
                 v.to_string()
-            }
-            else{
+            } else {
                 caps[0].to_string()
             }
-
-        }).into_owned()
+        })
+        .into_owned()
     }
-
 }
 
 // The pair of variable name (as its used in rename string) and its value as a string
