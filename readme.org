@@ -17,9 +17,10 @@ It will display the list of these fragments for each file, from which you can co
 Keys of fragments are surrounded by 2 ~#~ signs, to display an actual ~#~ sign, please use ~##~.
 
 ** Script Extension
-Any number of scripts (python at the moment) can be set to run on the command line
+Any number of scripts (python at the moment) can be set to run on the command line.
+Delimit multiple scripts with a comma
 #+begin_src
-jrenamer file.txt other_file.txt -s gps_getter.py
+jrenamer file.txt other_file.txt -s gps_getter.py,pigeon_or_not.py
 #+end_src
 
 A script should accept a map of fragments, and return new fragments to add to the total map.

@@ -96,6 +96,7 @@ fn get_matches() -> ArgMatches<'static> {
                 .long("script")
                 .value_name("script")
                 .multiple(true)
+                .require_delimiter(true)
                 .help("List of scripts to run")
                 .takes_value(true),
         )
