@@ -3,10 +3,7 @@
 * Intro
 JRenamer is a renaming tool that allows for the composition of arbitrary, script-generated fragments into new names.
 
-It supports both 0 effort, batch style invocations, as well as an interactive GUI experience.
-
 * Usage
-** CLI
 You must supply a list of input files
 #+begin_src
 jrenamer file.txt other_file.txt
@@ -19,7 +16,7 @@ It will display the list of these fragments for each file, from which you can co
 
 Keys of fragments are surrounded by 2 ~#~ signs, to display an actual ~#~ sign, please use ~##~.
 
-*** Script Extension
+** Script Extension
 Any number of scripts (python at the moment) can be set to run on the command line
 #+begin_src
 jrenamer file.txt other_file.txt -s gps_getter.py
@@ -34,7 +31,7 @@ Say our ~gps_getter.py~ can extract the GPS co-ordinates out of a file, it shoul
 {"gps_longitude": "37.62", "gps_latitude: "55.75"}
 #+end_src
 
-*** Batch Mode
+** Batch Mode
 Instead of user input, you can supply your format string at the command invocation with the ~-f/--format~ switch and it will be used.
 #+begin_src
 jrenamer file.txt other_file.txt -s gps_getter.py --format "#filesize#_#gps_longitude#"

@@ -22,7 +22,7 @@ pub struct FileInfo<'a> {
 }
 
 impl FileInfo<'_> {
-    pub fn from_path<'a, T: AsRef<Path> + ?Sized>(path: &'a T) -> Result<FileInfo<'a>> {
+    pub fn from_path<T: AsRef<Path> + ?Sized>(path: &T) -> Result<FileInfo> {
         let path = path.as_ref();
 
         let filename = path.file_name().context("File has no filename")?;

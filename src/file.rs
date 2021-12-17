@@ -1,6 +1,5 @@
-use anyhow::{anyhow, bail, Context, Error, Result};
+use anyhow::{anyhow, Context, Result};
 use regex::{Captures, Regex};
-use serde_json::{value::Value, Map};
 use std::{
     collections::HashMap,
     ffi::OsStr,
@@ -41,7 +40,7 @@ impl Serialize for File<'_> {
 }
 
 impl File<'_> {
-    pub fn from_path<'a, T: AsRef<Path> + ?Sized>(path: &'a T) -> File<'a> {
+    pub fn from_path<T: AsRef<Path> + ?Sized>(path: &T) -> File {
         let path_provided = path.as_ref().as_os_str();
         let file_info = FileInfo::from_path(path);
         let fragments = Fragments(HashMap::new());
@@ -166,7 +165,7 @@ impl File<'_> {
             println!("{:?}", caps);
 
             // Handle the escaped ## case
-            if &caps[1] == "" {
+            if caps[1].is_empty() {
                 return "#".to_string();
             };
 
@@ -203,8 +202,23 @@ mod tests {
             .insert("scariness".to_string(), "very_scary".to_string());
 
         assert_eq!(
-            file.parse_fstring("$date$_my_file_is$scariness$_and_only_cost_$$_dolars.txt"),
-            "12345_my_file_isvery_scary_and_only_cost_$_dolars.txt"
+            file.parse_fstring("#date#_my_file_is#scariness#_and_only_cost_##_dolars.txt"),
+            "12345_my_file_isvery_scary_and_only_cost_#_dolars.txt"
+        )
+    }
+
+    #[test]
+    fn test_fstring_alternation() {
+        let mut file = example_file();
+        file.fragments
+            .0
+            .insert("date".to_string(), "12345".to_string());
+
+        assert_eq!(
+            file.parse_fstring(
+                "(#date#|fail)_my_file_is(#scariness#|not scary)_and_only_cost_##_dolars.txt"
+            ),
+            "12345_my_file_isnot scary_and_only_cost_#_dolars.txt"
         )
     }
 }

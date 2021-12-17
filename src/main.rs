@@ -1,21 +1,18 @@
-use anyhow::{anyhow, bail, Context, Error, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::{App, Arg, ArgMatches};
-use file_info::FileInfo;
+
 use std::{
-    collections::HashMap,
-    ffi::OsStr,
     fs,
-    io::{self, Write},
+    io,
     path::Path,
-    process::{Command, Stdio},
 };
-#[macro_use]
+
 extern crate lazy_static;
 mod file;
 mod file_info;
 use file::File;
 
-fn path_exists<'a, T: AsRef<Path> + ?Sized>(path: &'a T) -> Result<&'a Path> {
+fn path_exists< T: AsRef<Path> + ?Sized>(path: &T) -> Result<&Path> {
     let path = path.as_ref();
     if path.exists() {
         Ok(path)
@@ -48,7 +45,6 @@ fn main() -> Result<()> {
                 None => user_fstring(f)?,
             };
 
-            //TODO Parse user input and insert fragments where needed
             let new_name = f.parse_fstring(&fstring);
             fs::rename(f.path_provided, new_name)?;
         }
