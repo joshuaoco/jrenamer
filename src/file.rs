@@ -51,6 +51,9 @@ impl File<'_> {
         }
     }
 
+    /// Runs the Python script at ~script~, fragments are passed as json to the stdin of the script
+    /// executable and the script should respond with a json comprising fragment names with their contents
+    /// these are then appended to the Files fragments set
     pub fn run_script(&mut self, script: &Path) -> Result<()> {
         let mut child = Command::new("python")
             .arg(script)
@@ -78,7 +81,6 @@ impl File<'_> {
         // TODO Don't wait forever
         let output = child.wait_with_output()?;
 
-        //TODO Parse output as fragment pieces and add to fragments hashmap
         if output.status.success() {
             let raw_output = String::from_utf8(output.stdout)?; //TODO Can we not do this
             println!("{:?}", &raw_output);
@@ -95,6 +97,7 @@ impl File<'_> {
         self.file_info.is_ok()
     }
 
+    /// Adds s to Files fragments assuming its a well formed string:string JSON object
     fn add_to_frags(&mut self, s: &str) {
         match serde_json::from_str::<HashMap<String, String>>(s) {
             Ok(frags) => self.fragments.0.extend(frags),
@@ -102,6 +105,12 @@ impl File<'_> {
         }
     }
 
+    /// Parses the inherent file information for a File and adds it to that files Fragments
+    /// This will always include the filename and relative path, but all other information is actually fallible
+    ///
+    /// It is at this point that the file information elements are converted to Strings from OsStrs,
+    /// as such there can be loss of information in non UTF-8 convertable text.
+    /// For now it silently converts and doesn't report any issues, since they're relatively rare.
     pub fn add_file_info_to_fragments(&mut self) {
         if let Ok(fi) = &self.file_info {
             self.fragments.0.insert(
@@ -127,7 +136,8 @@ impl File<'_> {
                 );
             }
 
-            // We only care about second resolution time
+            // Helper function to get the seconds from a SystemTime if present,
+	    // used since there's many times we want to extract the seconds from
             let s_if_there = |t: &Option<SystemTime>, key: &str| {
                 if let Some(t) = t {
                     if let Ok(n) = t.duration_since(SystemTime::UNIX_EPOCH) {

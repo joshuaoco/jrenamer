@@ -7,8 +7,8 @@ use std::{
 use anyhow::{Context, Result};
 use serde::Serialize;
 
-/// Main struct that is used for creating names
-//TODO: Improve and stabalize file_info format to scripts
+/// This holds various bits of information about a valid file that may
+/// or may not be retrievable.
 #[derive(Serialize, Debug)]
 pub struct FileInfo<'a> {
     pub filename: &'a OsStr,

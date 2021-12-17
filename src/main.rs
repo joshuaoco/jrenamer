@@ -12,14 +12,6 @@ mod file;
 mod file_info;
 use file::File;
 
-fn path_exists< T: AsRef<Path> + ?Sized>(path: &T) -> Result<&Path> {
-    let path = path.as_ref();
-    if path.exists() {
-        Ok(path)
-    } else {
-        Err(anyhow!("File {} doesn't exist", path.to_string_lossy()))
-    }
-}
 
 fn main() -> Result<()> {
     let matches = get_matches();
@@ -30,22 +22,26 @@ fn main() -> Result<()> {
     // Then we resolve scripts, checking if they exist and reporting if they don't
     let scripts = get_scripts(&matches);
 
-    // Run the scripts against the files, building up fragments as we go
+    // Operate on one file at a time
+    // TODO: Parallelise optionally?
     for f in files.iter_mut() {
         if f.exists() {
-            // This check is actually redundant as the existence of file_info already tells this
+	    // Add the base stat-ish file info as fragments
             f.add_file_info_to_fragments();
 
+	    // Run each script in turn and continue to build up fragments
             for s in scripts.iter() {
                 f.run_script(s)?;
             }
 
+	    // If the format string was specified with a flag, use that, else prompt for it
             let fstring = match matches.value_of("format") {
                 Some(val) => val.to_string(),
                 None => user_fstring(f)?,
             };
 
             let new_name = f.parse_fstring(&fstring);
+	    // TODO: Provide a dry run option which just displays what change would be made
             fs::rename(f.path_provided, new_name)?;
         }
     }
@@ -55,7 +51,6 @@ fn main() -> Result<()> {
 // TODO: Genericise
 
 fn get_files<'a>(ms: &'a ArgMatches) -> Result<Vec<File<'a>>> {
-    // First we resolve the paths into their file info format
     match ms.values_of("input") {
         Some(vals) => Ok(vals.map(File::from_path).collect::<Vec<File>>()),
         None => {
@@ -119,4 +114,13 @@ fn get_matches() -> ArgMatches<'static> {
                 .takes_value(true),
         )
         .get_matches()
+}
+
+fn path_exists< T: AsRef<Path> + ?Sized>(path: &T) -> Result<&Path> {
+    let path = path.as_ref();
+    if path.exists() {
+        Ok(path)
+    } else {
+        Err(anyhow!("File {} doesn't exist", path.to_string_lossy()))
+    }
 }
