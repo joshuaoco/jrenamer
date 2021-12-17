@@ -25,11 +25,15 @@ jrenamer file.txt other_file.txt -s gps_getter.py
 A script should accept a map of fragments, and return new fragments to add to the total map.
 Using this, you can build up a list of fragments to use in the final filename allocation
 
-**** Example
-Say our ~gps_getter.py~ can extract the GPS co-ordinates out of a file, it should then print to the stdout a JSON object in the form
+*** Example
+Say our ~gps_getter.py~ can extract the GPS co-ordinates out of a file accessing it via the ~filename~ fragment, it should then print to the stdout a JSON object in the form
 #+begin_src json
 {"gps_longitude": "37.62", "gps_latitude: "55.75"}
 #+end_src
+
+*** Write your own!
+The intent of this program is to offload custom renaming work to scripts, so if you have a specific need, whip up a quick script and combine the fragments!
+There is an example script called ~example_script.py~ distributed with the source to get you going.
 
 ** Batch Mode
 Instead of user input, you can supply your format string at the command invocation with the ~-f/--format~ switch and it will be used.
