@@ -137,7 +137,7 @@ impl File<'_> {
             }
 
             // Helper function to get the seconds from a SystemTime if present,
-	    // used since there's many times we want to extract the seconds from
+            // used since there's many times we want to extract the seconds from
             let s_if_there = |t: &Option<SystemTime>, key: &str| {
                 if let Some(t) = t {
                     if let Ok(n) = t.duration_since(SystemTime::UNIX_EPOCH) {

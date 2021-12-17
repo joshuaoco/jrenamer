@@ -1,17 +1,12 @@
 use anyhow::{anyhow, bail, Result};
 use clap::{App, Arg, ArgMatches};
 
-use std::{
-    fs,
-    io,
-    path::Path,
-};
+use std::{fs, io, path::Path};
 
 extern crate lazy_static;
 mod file;
 mod file_info;
 use file::File;
-
 
 fn main() -> Result<()> {
     let matches = get_matches();
@@ -26,22 +21,22 @@ fn main() -> Result<()> {
     // TODO: Parallelise optionally?
     for f in files.iter_mut() {
         if f.exists() {
-	    // Add the base stat-ish file info as fragments
+            // Add the base stat-ish file info as fragments
             f.add_file_info_to_fragments();
 
-	    // Run each script in turn and continue to build up fragments
+            // Run each script in turn and continue to build up fragments
             for s in scripts.iter() {
                 f.run_script(s)?;
             }
 
-	    // If the format string was specified with a flag, use that, else prompt for it
+            // If the format string was specified with a flag, use that, else prompt for it
             let fstring = match matches.value_of("format") {
                 Some(val) => val.to_string(),
                 None => user_fstring(f)?,
             };
 
             let new_name = f.parse_fstring(&fstring);
-	    // TODO: Provide a dry run option which just displays what change would be made
+            // TODO: Provide a dry run option which just displays what change would be made
             fs::rename(f.path_provided, new_name)?;
         }
     }
@@ -116,7 +111,7 @@ fn get_matches() -> ArgMatches<'static> {
         .get_matches()
 }
 
-fn path_exists< T: AsRef<Path> + ?Sized>(path: &T) -> Result<&Path> {
+fn path_exists<T: AsRef<Path> + ?Sized>(path: &T) -> Result<&Path> {
     let path = path.as_ref();
     if path.exists() {
         Ok(path)
