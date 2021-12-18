@@ -1,7 +1,11 @@
 use anyhow::{anyhow, bail, Result};
 use clap::{App, Arg, ArgMatches};
 
-use std::{fs, io, path::Path};
+use std::{
+    fs,
+    io::{self, Write},
+    path::Path,
+};
 
 extern crate lazy_static;
 mod file;
@@ -21,6 +25,8 @@ fn main() -> Result<()> {
     // TODO: Parallelise optionally?
     for f in files.iter_mut() {
         if f.exists() {
+            println!("File: {}", f.path_provided.to_string_lossy());
+
             // Add the base stat-ish file info as fragments
             f.add_file_info_to_fragments();
 
@@ -29,10 +35,13 @@ fn main() -> Result<()> {
                 f.run_script(s)?;
             }
 
+            // Print the fragments in a nice readable way
+            println!("Fragments from scripts available:\n {}", f.fragments);
+
             // If the format string was specified with a flag, use that, else prompt for it
             let fstring = match matches.value_of("format") {
                 Some(val) => val.to_string(),
-                None => user_fstring(f)?,
+                None => user_fstring()?,
             };
 
             let new_name = f.parse_fstring(&fstring);
@@ -54,11 +63,10 @@ fn get_files<'a>(ms: &'a ArgMatches) -> Result<Vec<File<'a>>> {
     }
 }
 
-fn user_fstring(f: &File) -> Result<String> {
-    println!("File: {}", f.path_provided.to_string_lossy());
-    println!("Fragments from scripts available: {:?}", f.fragments);
+fn user_fstring() -> Result<String> {
+    print!("Enter your format string: ");
+    io::stdout().flush().unwrap();
 
-    //TODO Get user input for filename
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
     Ok(input.trim().to_string())

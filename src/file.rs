@@ -3,6 +3,7 @@ use regex::{Captures, Regex};
 use std::{
     collections::HashMap,
     ffi::OsStr,
+    fmt,
     io::Write,
     path::Path,
     process::{Command, Stdio},
@@ -192,6 +193,14 @@ impl File<'_> {
 // The pair of variable name (as its used in rename string) and its value as a string
 #[derive(Debug, serde::Serialize)]
 pub struct Fragments(HashMap<String, String>);
+
+impl fmt::Display for Fragments {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        self.0
+            .iter()
+            .try_for_each(|(k, v)| writeln!(f, "{}: {}", k, v))
+    }
+}
 
 #[cfg(test)]
 mod tests {
