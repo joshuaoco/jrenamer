@@ -29,7 +29,7 @@ Using this, you can build up a list of fragments to use in the final filename al
 *** Example
 Say our ~gps_getter.py~ can extract the GPS co-ordinates out of a file accessing it via the ~filename~ fragment, it should then print to the stdout a JSON object in the form
 #+begin_src json
-{"gps_longitude": "37.62", "gps_latitude: "55.75"}
+{"gps_longitude": "37.62", "gps_latitude": "55.75"}
 #+end_src
 
 *** Write your own!
