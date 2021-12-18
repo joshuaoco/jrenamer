@@ -47,7 +47,14 @@ fn main() -> Result<()> {
             };
 
             let new_name = f.parse_fstring(&fstring);
-            if !matches.is_present("dry-run") {
+
+            if matches.is_present("dry-run") {
+                println!(
+                    "Would rename: {} -> {}",
+                    f.path_provided.to_string_lossy(),
+                    new_name
+                )
+            } else {
                 fs::rename(f.path_provided, new_name)?;
             }
         }
