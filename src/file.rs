@@ -84,7 +84,6 @@ impl File<'_> {
 
         if output.status.success() {
             let raw_output = String::from_utf8(output.stdout)?; //TODO Can we not do this
-            println!("{:?}", &raw_output);
             self.add_to_frags(&raw_output);
         } else {
             let err = String::from_utf8(output.stderr)?;
@@ -173,8 +172,6 @@ impl File<'_> {
         let re: Regex = Regex::new(r"\#(.*?)\#").unwrap();
 
         re.replace_all(fstring, |caps: &Captures| {
-            println!("{:?}", caps);
-
             // Handle the escaped ## case
             if caps[1].is_empty() {
                 return "#".to_string();

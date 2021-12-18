@@ -12,6 +12,8 @@ mod file;
 mod file_info;
 use file::File;
 
+// TODO: Improve error handling, use Results and percolate rather than eprintlning
+
 fn main() -> Result<()> {
     let matches = get_matches();
 
