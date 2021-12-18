@@ -45,8 +45,9 @@ fn main() -> Result<()> {
             };
 
             let new_name = f.parse_fstring(&fstring);
-            // TODO: Provide a dry run option which just displays what change would be made
-            fs::rename(f.path_provided, new_name)?;
+            if !matches.is_present("dry-run") {
+                fs::rename(f.path_provided, new_name)?;
+            }
         }
     }
     Ok(())
@@ -116,6 +117,12 @@ fn get_matches() -> ArgMatches<'static> {
                 .multiple(false)
                 .help("Use this string instead of prompting for input")
                 .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("dry-run")
+                .short("d")
+                .long("dry-run")
+                .help("If used files will be accessed, but no renaming will take place"),
         )
         .get_matches()
 }
